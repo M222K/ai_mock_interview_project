@@ -1,9 +1,11 @@
-import{ ReactNode } from 'react'
+import { ReactNode } from 'react'
+import { Toaster } from 'sonner'
 
-const Rootlayout = ({children}:{children:ReactNode}) => {
+const Rootlayout = ({ children }: { children: ReactNode }) => {
     return (
         <div>
-{children}
+            {children}
+            <Toaster />
         </div>
     )
 }
