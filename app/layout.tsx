@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${monaSans.className} antialiased`} //applies this to all the app
+        className={`${monaSans.className} antialiased pattern`} //applies this to all the app
       >
         {children}
       </body>
