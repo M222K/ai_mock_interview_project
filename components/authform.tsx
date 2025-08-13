@@ -1,30 +1,37 @@
 "use client"  //whenevr you use a client side server component you need to add this directive at the top
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { email, z } from "zod"
+import { z } from "zod"
 import Image from 'next/image';
 import Link from "next/link";
 import { toast } from "sonner";
 
-
 import { Button } from "@/components/ui/button"
 import {
-    Form
+    Form,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormControl,
+    FormDescription,
+    FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { useRouter } from "next/navigation";
 
-const AuthFormSchema = (type: FormType) => {
-    return
-    z.object({
-        name: type === 'sign-up' ? z.string().min(3) : z.string().optional,
+type FormType = "sign-in" | "sign-up";
+
+const authFormSchema = (type: FormType) => {
+    return z.object({
+        name: type === "sign-up" ? z.string().min(3) : z.string().optional(),
         email: z.string().email(),
         password: z.string().min(3),
-    })
-}
+    });
+};
 
 const authform = ({ type }: { type: FormType }) => {
-
-    const FormSchema = AuthFormSchema(type);
+    const router = useRouter();
+    const formSchema = authFormSchema(type);
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -41,9 +48,11 @@ const authform = ({ type }: { type: FormType }) => {
         // ✅ This will be type-safe and validated.
         try {
             if (type === 'sign-up') {
-                console.log('sign-up', values);
+                toast.success('Account created successfully.Please sign in.');
+                router.push('/sign-in');
             } else {
-                console.log('sign-in', values);
+                toast.success('Signed in successfully.');
+                router.push('/');
             }
         } catch (error) {
             console.log(error);
@@ -63,16 +72,70 @@ const authform = ({ type }: { type: FormType }) => {
                 <h3 className="text-center">Practice Job Interviews with AI</h3>
 
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6 mt-4 form">
-                        {!isSignIn && <p>Name</p>}
-                        <p>Email</p>
-                        <p>Password</p>
-                        <Button type="submit" className="btn">{isSignIn ? 'Sign-In' : 'Create an Account'}</Button>
+                    <form onSubmit={form.handleSubmit(onSubmit)}
+                        className="w-full space-y-6 mt-4 form">
+                        {!isSignIn && (
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Your Name" {...field} />
+                                        </FormControl>
+                                        <FormDescription>
+                                            This is your public display name.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
+
+                        <FormField 
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Your email address" type="email" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                        Enter your email address.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField 
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Enter your password" type="password" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                        Enter your password.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <Button type="submit"
+                            className="btn">{isSignIn ? 'Sign-In' : 'Create an Account'}
+                        </Button>
                     </form>
-                    <p className="text-center">{isSignIn ? 'No account yet ?' : 'Have an account already'}
-                        <Link href={!isSignIn ? '/sign-in' : '/sign-up'} className="font-bold text-user-primary ml-1">{!isSignIn ? 'Sign-In' : 'Sign-up'}</Link>
-                    </p>
                 </Form>
+
+                <p className="text-center">{isSignIn ? 'No account yet ?' : 'Have an account already?'}
+                    <Link href={!isSignIn ? '/sign-in' : '/sign-up'} className="font-bold text-user-primary ml-1">{!isSignIn ? 'Sign-In' : 'Sign-up'}</Link>
+                </p>
 
             </div>
         </div>
